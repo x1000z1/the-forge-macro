@@ -4,7 +4,7 @@
 
   # The Forge Macro
 <div align="center">
-  <img width="302" height="282" alt="image" src="https://github.com/user-attachments/assets/86ef6fb6-736e-4440-ba93-48bb12f55686" />
+ <img width="302" height="282" alt="image" src="https://github.com/user-attachments/assets/a3fae40b-2f24-4e9f-8bb8-97c9a2fed61e" />
 </div>
 
 ## 🚀 Features

@@ -5,7 +5,7 @@ use std::{
 };
 
 use active_win_pos_rs::get_active_window;
-use eframe::egui::{self, RichText, mutex::Mutex};
+use eframe::egui::{self, mutex::Mutex};
 
 mod fonts;
 mod macro_forge;
@@ -30,6 +30,7 @@ fn main() {
     let is_busy = Arc::new(AtomicBool::new(false));
 
     let potion_key = Arc::new(Mutex::new("3".to_string()));
+    let time_key = Arc::new(Mutex::new(15));
 
     let clicker_busy_flag = is_busy.clone();
     let clicker_running_flag = is_clicked.clone();
@@ -45,12 +46,19 @@ fn main() {
     thread::spawn(move || {
         macro_forge::luck(luck_running_flag, luck_busy_flag, luck_key_flag);
     });
+
+    let sell_busy_flag = is_busy.clone();
+    let sell_running_flag = is_sell.clone();
+    let timme_key_flag = time_key.clone();
+    thread::spawn(move || {
+        macro_forge::sell(sell_running_flag, sell_busy_flag, timme_key_flag);
+    });
     eframe::run_native(
         "TFM",
         native_options,
         Box::new(|cc| {
             Ok(Box::new(MyEguiApp::new(
-                cc, is_clicked, is_luck, is_sell, potion_key,
+                cc, is_clicked, is_luck, is_sell, potion_key, time_key,
             )))
         }),
     );
@@ -61,6 +69,7 @@ struct MyEguiApp {
     pub is_luck: Arc<AtomicBool>,
     pub is_sell: Arc<AtomicBool>,
     pub potion_key: Arc<Mutex<String>>,
+    pub time_key: Arc<Mutex<u8>>,
 }
 
 impl MyEguiApp {
@@ -70,9 +79,11 @@ impl MyEguiApp {
         is_luck: Arc<AtomicBool>,
         is_sell: Arc<AtomicBool>,
         potion_key: Arc<Mutex<String>>,
+        time_key: Arc<Mutex<u8>>,
     ) -> Self {
         let my_font_data = include_bytes!("../assets/Montserrat-SemiBold.ttf");
-        fonts::font_set(my_font_data);
+        let my_fonts = fonts::font_set(my_font_data);
+        _cc.egui_ctx.set_fonts(my_fonts);
         // Customize egui here with cc.egui_ctx.set_fonts and cc.egui_ctx.set_visuals.
         // Restore app state using cc.storage (requires the "persistence" feature).
         // Use the cc.gl (a glow::Context) to create graphics shaders and buffers that you can use
@@ -83,6 +94,7 @@ impl MyEguiApp {
             is_luck,
             is_sell,
             potion_key,
+            time_key,
         }
     }
 }
@@ -141,7 +153,7 @@ impl eframe::App for MyEguiApp {
                 ui.add_space(8.0);
                 ui.vertical_centered(|ui| {
                     ui.add_space(10.0);
-                    ui.heading(egui::RichText::new("The Forge Macro").size(32.0).strong());
+                    ui.heading(egui::RichText::new("The Forge Macro").size(28.0).strong());
                     ui.add_space(10.0);
                     ui.label("Advanced automation for The Forge");
                     ui.add_space(15.0);
@@ -166,9 +178,7 @@ impl eframe::App for MyEguiApp {
                                 }
                             });
                             ui.end_row();
-
                             ui.label("🍀 Luck Potion");
-
                             ui.horizontal(|ui| {
                                 let mut luck_state =
                                     self.is_luck.load(std::sync::atomic::Ordering::Relaxed);
@@ -184,15 +194,13 @@ impl eframe::App for MyEguiApp {
                                     let mut key = self.potion_key.lock();
                                     ui.add(
                                         egui::TextEdit::singleline(&mut *key)
-                                            .desired_width(15.0)
+                                            .desired_width(25.0)
                                             .char_limit(1)
                                             .horizontal_align(egui::Align::Center),
                                     );
                                 }
                             });
-
                             ui.end_row();
-
                             ui.label("💰 Auto Sell");
                             let mut sell_state =
                                 self.is_sell.load(std::sync::atomic::Ordering::Relaxed);
@@ -201,6 +209,20 @@ impl eframe::App for MyEguiApp {
                                     self.is_sell
                                         .store(sell_state, std::sync::atomic::Ordering::Relaxed);
                                 }
+                                ui.add_space(10.0);
+                                ui.label("Dur:");
+                                let mut dur = self.time_key.lock();
+                                ui.scope(|ui| {
+                                    ui.style_mut().spacing.interact_size.x = 0.0;
+                                    ui.style_mut().spacing.item_spacing.x = 0.0;
+                                    ui.add_sized(
+                                        [32.0, 20.0],
+                                        egui::DragValue::new(&mut *dur)
+                                            .range(1..=60)
+                                            .max_decimals(0)
+                                            .speed(0.5),
+                                    );
+                                });
                             });
                             ui.end_row();
                         });

@@ -71,10 +71,10 @@ fn toggle_ui_compact(ui: &mut egui::Ui, on: &mut bool) -> egui::Response {
     response
 }
 
-pub fn toggle(on: &mut bool) -> impl egui::Widget + '_ {
-    move |ui: &mut egui::Ui| toggle_ui(ui, on)
-}
+// pub fn toggle(on: &mut bool) -> impl egui::Widget + '_ {
+//     move |ui: &mut egui::Ui| toggle_ui(ui, on)
+// }
 
-pub fn url_to_file_source_code() -> String {
-    format!("https://github.com/emilk/egui/blob/main/{}", file!())
-}
+// pub fn url_to_file_source_code() -> String {
+//     format!("https://github.com/emilk/egui/blob/main/{}", file!())
+// }

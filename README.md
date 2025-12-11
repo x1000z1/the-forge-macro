@@ -23,7 +23,7 @@ This project leverages the **Rust** ecosystem to ensure stability and performanc
 ## 📦 How to Run
 1.  Clone the repository:
     ```bash
-    git clone [https://github.com/x1000z1/the-forge-macro.git](https://github.com/x1000z1/the-forge-macro.git)
+    git clone https://github.com/x1000z1/the-forge-macro.git(https://github.com/x1000z1/the-forge-macro.git)
     ```
 2.  Navigate to the directory and run:
     ```bash

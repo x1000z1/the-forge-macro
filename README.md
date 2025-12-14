@@ -3,7 +3,7 @@
 
 <div align="center">
 <img width="256" height="256" alt="TFM" src="https://github.com/user-attachments/assets/be237926-cad5-43d9-9293-62148523c6aa" />
-<img width="302" height="282" alt="image" src="https://github.com/user-attachments/assets/f67c1d34-a8e4-4089-8060-81243e707349" />
+<img width="302" height="282" alt="image" src="https://github.com/user-attachments/assets/9bdfcfa3-43ce-4daa-bcc3-586cc61c6a94" />
 </div>
 
 ## 🚀 Features

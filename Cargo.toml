@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-eframe = "0.33.2" #Biblioteka do GUI
+eframe = "0.33.3" #Biblioteka do GUI
 enigo = "0.6.1" #Klikanie
 rand = "0.9.2" #Losowość
 active-win-pos-rs = "0.9.1" #Aktywne okno

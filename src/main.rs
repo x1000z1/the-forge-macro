@@ -4,11 +4,11 @@ use std::{
     thread,
 };
 
-use active_win_pos_rs::get_active_window;
 use eframe::egui::{self, mutex::Mutex};
 
 use crate::config::AppConfig;
 
+mod bot_data;
 mod config;
 mod fonts;
 mod macro_forge;
@@ -18,16 +18,20 @@ fn main() {
     let icon = fonts::load_icon();
     let loaded_config = config::AppConfig::load();
 
-    let native_options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_inner_size([300.0, 250.0])
-            .with_resizable(false)
-            .with_maximize_button(false)
-            .with_always_on_top()
-            .with_decorations(true)
-            .with_transparent(true)
-            .with_icon(icon),
+    let mut viewport_build = egui::ViewportBuilder::default()
+        .with_inner_size([300.0, 250.0])
+        .with_resizable(false)
+        .with_maximize_button(false)
+        .with_always_on_top()
+        .with_decorations(true)
+        .with_transparent(true)
+        .with_icon(icon);
 
+    if let Some((x, y)) = loaded_config.window_pos {
+        viewport_build = viewport_build.with_position([x, y]);
+    }
+    let native_options = eframe::NativeOptions {
+        viewport: viewport_build,
         ..Default::default()
     };
     let is_clicked = Arc::new(AtomicBool::new(false));
@@ -64,7 +68,13 @@ fn main() {
         native_options,
         Box::new(|cc| {
             Ok(Box::new(MyEguiApp::new(
-                cc, is_clicked, is_luck, is_sell, potion_key, time_key,
+                cc,
+                is_clicked,
+                is_luck,
+                is_sell,
+                potion_key,
+                time_key,
+                loaded_config.window_pos,
             )))
         }),
     );
@@ -76,6 +86,7 @@ struct MyEguiApp {
     pub is_sell: Arc<AtomicBool>,
     pub potion_key: Arc<Mutex<String>>,
     pub time_key: Arc<Mutex<u8>>,
+    pub window_pos: Option<(f32, f32)>,
 }
 
 impl MyEguiApp {
@@ -86,6 +97,7 @@ impl MyEguiApp {
         is_sell: Arc<AtomicBool>,
         potion_key: Arc<Mutex<String>>,
         time_key: Arc<Mutex<u8>>,
+        window_pos: Option<(f32, f32)>,
     ) -> Self {
         let my_font_data = include_bytes!("../assets/Montserrat-SemiBold.ttf");
         let my_fonts = fonts::font_set(my_font_data);
@@ -101,12 +113,14 @@ impl MyEguiApp {
             is_sell,
             potion_key,
             time_key,
+            window_pos,
         }
     }
     fn save_state(&self) {
         let config_to_save = AppConfig {
             potion_key: self.potion_key.lock().clone(),
             time_key: *self.time_key.lock(),
+            window_pos: self.window_pos,
         };
 
         if let Err(e) = config_to_save.save() {
@@ -119,29 +133,12 @@ impl MyEguiApp {
 
 impl eframe::App for MyEguiApp {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
-        if let Ok(window) = get_active_window() {
-            if window.title.to_lowercase().contains("roblox") {
-                let r_x = window.position.x as f32;
-                let r_y = window.position.y as f32;
-
-                let target_pos = egui::pos2(r_x + 8.0, r_y + 32.0);
-
-                ctx.send_viewport_cmd(egui::ViewportCommand::OuterPosition(target_pos));
+        ctx.input(|i| {
+            if let Some(rect) = i.viewport().outer_rect {
+                self.window_pos = Some((rect.min.x, rect.min.y));
             }
-        }
-        // Resizable window fn
-        // let screen_rect = ctx.input(|i| i.viewport_rect());
+        });
 
-        // let current_scale = ctx.pixels_per_point();
-
-        // let physical_width = screen_rect.width() * current_scale;
-
-        // let new_scale = (physical_width / 800.0).clamp(1.0, 1.8);
-
-        // if (new_scale - current_scale).abs() > 0.01 {
-        //     ctx.set_pixels_per_point(new_scale);
-        // }
-        // fn end
         egui::TopBottomPanel::bottom("footer_panel")
             .resizable(false)
             .show(ctx, |ui| {

@@ -2,7 +2,7 @@
 **TFM** is a lightweight, high-performance automation tool for the "The Forge" game mode in Roblox. Built entirely in **Rust**, it focuses on speed, safety, and low resource usage.
 
 <div align="center">
-    <img width="256" height="256" alt="icon" src="https://github.com/user-attachments/assets/fb957b85-d456-4e68-a571-45f9d907cfa8" />
+<img width="256" height="256" alt="TFM" src="https://github.com/user-attachments/assets/be237926-cad5-43d9-9293-62148523c6aa" />
 <img width="302" height="282" alt="image" src="https://github.com/user-attachments/assets/f67c1d34-a8e4-4089-8060-81243e707349" />
 </div>
 
